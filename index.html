@@ -5,6 +5,7 @@
     <link rel="icon" href="kanata.webp">
     <title>天音かなたのホームページ</title>
     <style>
+        /* 全体のレイアウト設定 */
         html, body {
             margin: 0;
             padding: 0;
@@ -12,54 +13,58 @@
             width: 100%;
             overflow: hidden;
             background-color: #ffffff;
-        }
-
-        body {
-            display: flex;
             font-family: "MS Pゴシック", sans-serif;
         }
 
-        /* 左側メニュー：以前の指定通り18% */
+        body {
+            display: flex; /* サイドバーとメインを横並びに */
+        }
+
+        /* 左側メニュー */
         nav {
-            width: 18%; 
+            width: 18%; /* 初期値 */
             min-width: 50px;
             height: 100%;
-            background-color: #F8F8FF;
+            background-color: #F8F8FF; /* menu.htmlの背景色 */
             flex-shrink: 0;
             overflow: hidden;
         }
 
-        /* 境界線：色を大幅に薄くし、従来のフレームに近い見た目に */
-        #splitter {
-            width: 4px; /* 少し細くしました */
-            cursor: col-resize;
-            background-color: #e0e0e0; /* 濃いグレーから薄いグレーへ変更 */
+        /* 手動リサイズ用の境界線（スプリッター） */
+        #resizer {
+            width: 4px;
+            background-color: #e0e0e0; 
+            cursor: col-resize; /* マウスを乗せると左右矢印になる */
+            flex-shrink: 0;
             border-left: 1px solid #f5f5f5;
             border-right: 1px solid #c0c0c0;
-            flex-shrink: 0;
         }
-        #splitter:hover {
+
+        #resizer:hover {
             background-color: #d0d0d0;
         }
 
-        /* 右側メイン：スクロールが正常に機能するように修正 */
+        /* 右側メイン */
         main {
             flex-grow: 1;
             height: 100%;
-            /* overflow: hidden を削除し、iframe 側のスクロールを優先 */
+            overflow: hidden;
         }
 
         iframe {
             width: 100%;
             height: 100%;
             border: none;
-            /* スクロールを確実に行わせる */
             display: block;
         }
 
-        /* ドラッグ中の挙動対策 */
-        .resizing { cursor: col-resize; }
-        .resizing iframe { pointer-events: none; }
+        /* ドラッグ中にiframeがマウスイベントを奪わないための設定 */
+        .resizing {
+            cursor: col-resize;
+        }
+        .resizing iframe {
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -68,7 +73,7 @@
         <iframe src="menu.html" name="left" title="サイドメニュー"></iframe>
     </nav>
 
-    <div id="splitter"></div>
+    <div id="resizer"></div>
 
     <main>
         <iframe src="top.html" name="right" title="メインコンテンツ"></iframe>
@@ -76,28 +81,31 @@
 
     <script>
         const sidebar = document.getElementById('sidebar');
-        const splitter = document.getElementById('splitter');
+        const resizer = document.getElementById('resizer');
         let isResizing = false;
 
-        splitter.addEventListener('mousedown', (e) => {
+        // 境界線を掴んだ時
+        resizer.addEventListener('mousedown', (e) => {
             isResizing = true;
             document.body.classList.add('resizing');
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', () => {
-                isResizing = false;
-                document.body.classList.remove('resizing');
-                document.removeEventListener('mousemove', handleMouseMove);
-            });
         });
 
-        function handleMouseMove(e) {
+        // マウスを動かしている時
+        document.addEventListener('mousemove', (e) => {
             if (!isResizing) return;
-            const newWidth = e.clientX;
-            // 極端なサイズ変更を制限
-            if (newWidth > 50 && newWidth < window.innerWidth * 0.7) {
-                sidebar.style.width = newWidth + 'px';
+            
+            const offsetLeft = e.clientX;
+            // 画面の80%以上は広がらないように制限
+            if (offsetLeft > 50 && offsetLeft < window.innerWidth * 0.8) {
+                sidebar.style.width = offsetLeft + 'px';
             }
-        }
+        });
+
+        // マウスを離した時
+        document.addEventListener('mouseup', () => {
+            isResizing = false;
+            document.body.classList.remove('resizing');
+        });
     </script>
 </body>
 </html>

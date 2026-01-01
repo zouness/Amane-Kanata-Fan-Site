@@ -6,54 +6,52 @@
     <link rel="icon" href="kanata.webp">
     <title>天音かなたのホームページ</title>
     <style>
-        /* 画面全体を横並びにする設定 */
         body {
             margin: 0;
             padding: 0;
             display: flex;
             height: 100vh;
-            overflow: hidden; /* 親ページはスクロールさせない */
+            overflow: hidden;
             font-family: "MS Pゴシック", sans-serif;
         }
 
-        /* 左側メニュー：固定 */
+        /* 左側メニュー */
         nav {
-            width: 18%; /* 旧index.htmlの指定通り */
+            width: 180px; /* パーセントではなく固定幅にすることで、スマホでも形を維持 */
             background-color: #F8F8FF;
             border-right: 5px double #888;
             height: 100%;
             flex-shrink: 0;
         }
 
-        /* 右側メイン：中身だけが入れ替わるエリア */
+        /* 右側メイン */
         main {
             flex-grow: 1;
             height: 100%;
         }
 
-        /* アイフレームを画面いっぱいに広げる */
         iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
 
-        /* スマホ対応：画面が狭いときはメニューを上に */
-        @media (max-width: 800px) {
-            body { flex-direction: column; }
-            nav { width: 100%; height: auto; border-right: none; border-bottom: 5px double #888; }
-            main { height: auto; flex-grow: 1; }
+        /* スマホ等、画面幅が非常に狭い場合の設定 */
+        @media (max-width: 480px) {
+            nav {
+                width: 120px; /* スマホ時は少しメニューを細くしてメインを広く確保 */
+            }
         }
     </style>
 </head>
 <body>
 
     <nav>
-        <iframe src="menu.html" name="left"></iframe>
+        <iframe src="menu.html" name="left" title="サイドメニュー"></iframe>
     </nav>
 
     <main>
-        <iframe src="top.html" name="right"></iframe>
+        <iframe src="top.html" name="right" title="メインコンテンツ"></iframe>
     </main>
 
 </body>

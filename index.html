@@ -2,18 +2,59 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="kanata.webp">
     <title>天音かなたのホームページ</title>
-</head>
+    <style>
+        /* 画面全体を横並びにする設定 */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden; /* 親ページはスクロールさせない */
+            font-family: "MS Pゴシック", sans-serif;
+        }
 
-<frameset cols="18%,*" frameborder="1" border="5">
-    <frame src="menu.html" name="left">
-    <frame src="top.html" name="right">
-    
-    <noframes>
-        <body>
-            フレーム対応のブラウザでご覧ください。
-        </body>
-    </noframes>
-</frameset>
+        /* 左側メニュー：固定 */
+        nav {
+            width: 18%; /* 旧index.htmlの指定通り */
+            background-color: #F8F8FF;
+            border-right: 5px double #888;
+            height: 100%;
+            flex-shrink: 0;
+        }
+
+        /* 右側メイン：中身だけが入れ替わるエリア */
+        main {
+            flex-grow: 1;
+            height: 100%;
+        }
+
+        /* アイフレームを画面いっぱいに広げる */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* スマホ対応：画面が狭いときはメニューを上に */
+        @media (max-width: 800px) {
+            body { flex-direction: column; }
+            nav { width: 100%; height: auto; border-right: none; border-bottom: 5px double #888; }
+            main { height: auto; flex-grow: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <iframe src="menu.html" name="left"></iframe>
+    </nav>
+
+    <main>
+        <iframe src="top.html" name="right"></iframe>
+    </main>
+
+</body>
 </html>

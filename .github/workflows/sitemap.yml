@@ -1,20 +1,21 @@
-name: Generate xml sitemap
+name: Generate xml sitemap and Deploy
 
 on:
   push:
     branches:
       - main
 
-# ロボットにファイルの書き込み権限を与えます
 permissions:
   contents: write
+  pages: write      # デプロイに必要
+  id-token: write   # デプロイに必要
 
 jobs:
-  sitemap_job:
+  sitemap_and_deploy:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4 # 最新版推奨
       with:
         fetch-depth: 0 
 
@@ -24,14 +25,17 @@ jobs:
         base-url-path: https://zouness.github.io/Amane-Kanata-Fan-Site/
         include-html: true
         include-pdf: false
-        # 日付のみを記録する設定に変更
         date-only: true
 
-    - name: Commit and push
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add sitemap.xml
-        # 変更がある場合のみコミット
-        git commit -m "Automated sitemap update" || exit 0
-        git push
+    # --- ここからデプロイ処理 ---
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.' # リポジトリ全体をアップロード
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

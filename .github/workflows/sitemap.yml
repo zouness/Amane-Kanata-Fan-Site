@@ -3,12 +3,15 @@ name: Generate xml sitemap
 on:
   push:
     branches:
-      - main  # メインブランチに更新があった時に実行
+      - main
+
+# ロボットにファイルの書き込み権限を与えます
+permissions:
+  contents: write
 
 jobs:
   sitemap_job:
     runs-on: ubuntu-latest
-    name: generate-sitemap
     steps:
     - name: Checkout the repo
       uses: actions/checkout@v3
@@ -19,16 +22,16 @@ jobs:
       uses: cicirello/generate-sitemap@v1
       with:
         base-url-path: https://zouness.github.io/Amane-Kanata-Fan-Site/
-        # 最終更新日(lastmod)を自動取得する設定
-        date-from-git-last-commit: true
-        # サイトマップに含めるファイル
-        include-pdf: false
         include-html: true
+        include-pdf: false
+        # 日付のみを記録する設定に変更
+        date-only: true
 
     - name: Commit and push
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git add sitemap.xml
+        # 変更がある場合のみコミット
         git commit -m "Automated sitemap update" || exit 0
         git push

@@ -89,19 +89,58 @@
     </div>
 
     <nav id="sidebar">
-        <iframe src="menu.html" name="left" title="サイドメニュー"></iframe>
+        <iframe id="menu-frame" src="menu.html" name="left" title="サイドメニュー"></iframe>
     </nav>
 
     <div id="resizer"></div>
 
     <main>
-        <iframe src="top.html" name="right" title="メインコンテンツ"></iframe>
+        <iframe id="content-frame" src="top.html" name="right" title="メインコンテンツ"></iframe>
     </main>
 
     <script>
         const sidebar = document.getElementById('sidebar');
         const resizer = document.getElementById('resizer');
+        const menuFrame = document.getElementById('menu-frame');
+        const contentFrame = document.getElementById('content-frame');
+        const instrumentedDocuments = new WeakSet();
         let isResizing = false;
+
+        // GitHub PagesのHTMLキャッシュを避け、更新直後の内容を読み込む
+        function freshPageUrl(url, baseUrl = window.location.href) {
+            const freshUrl = new URL(url, baseUrl);
+            freshUrl.searchParams.set('_site_updated', Date.now().toString());
+            return freshUrl.href;
+        }
+
+        function installFreshPageLinks(frame) {
+            const frameDocument = frame.contentDocument;
+            if (!frameDocument || instrumentedDocuments.has(frameDocument)) return;
+
+            instrumentedDocuments.add(frameDocument);
+            frameDocument.addEventListener('click', (event) => {
+                const link = event.target.closest('a[href]');
+                if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#')) return;
+
+                const destination = new URL(href, frame.contentWindow.location.href);
+                const isLocalHtml = destination.origin === window.location.origin
+                    && destination.pathname.toLowerCase().endsWith('.html');
+                if (!isLocalHtml) return;
+
+                link.href = freshPageUrl(destination.href);
+            }, true);
+        }
+
+        menuFrame.addEventListener('load', () => installFreshPageLinks(menuFrame));
+        contentFrame.addEventListener('load', () => installFreshPageLinks(contentFrame));
+        installFreshPageLinks(menuFrame);
+        installFreshPageLinks(contentFrame);
+
+        // 初回表示のtop.htmlにも毎回新しいキャッシュキーを付ける
+        contentFrame.src = freshPageUrl('top.html');
 
         // 境界線を掴んだ時
         resizer.addEventListener('mousedown', (e) => {
